@@ -1,8 +1,27 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import styled, {css} from "styled-components";
+import {AddForm} from "../components/add-form"
+import { useEffect, useState } from "react";
+import useSWR from "swr";
+
+const fetcher = (resource, init) =>
+  fetch(resource, init).then((res) => res.json());
+
+// fetcher-funktion aus dem Hook kopiert
 
 export default function Home() {
+
+const jokes = useSWR("/api/jokes", fetcher);
+
+const [isCreating, setIsCreating] = useState(false);
+const [error, setError] = useState();
+
+
+console.log(jokes)
+
+
   return (
     <div className={styles.container}>
       <Head>
@@ -12,58 +31,31 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <CenterElement>
+        <h1 className={styles.title}>Jokes! Jokes! Jokes!</h1>
+        <AddForm/>
+        {jokes.data ? jokes.data.map(element => <OneJoke>{element.name}</OneJoke>) : "loading..."}
+        </CenterElement>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
     </div>
   )
 }
+
+
+const CenterElement = styled.div`
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+gap:2rem;
+padding:1rem;
+border-radius:2rem;
+background: rgb(205,176,224);
+background: linear-gradient(90deg, rgba(205,176,224,1) 0%, rgba(168,224,241,1) 50%, rgba(69,168,252,1) 100%);
+`
+
+const OneJoke = styled.div`
+list-style:none;
+font-size:1.3rem;
+`
